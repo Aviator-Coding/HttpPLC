@@ -10,7 +10,7 @@ import (
 )
 
 // StartServerWithGracefulShutdown function for starting server with a graceful shutdown.
-func StartServerWithGracefulShutdown(a *fiber.App) {
+func StartServerWithGracefulShutdown(app *fiber.App) {
 	// Create channel for idle connections.
 	idleConnsClosed := make(chan struct{})
 
@@ -20,7 +20,7 @@ func StartServerWithGracefulShutdown(a *fiber.App) {
 		<-sigint
 
 		// Received an interrupt signal, shutdown.
-		if err := a.Shutdown(); err != nil {
+		if err := app.Shutdown(); err != nil {
 			// Error from closing listeners, or context timeout:
 			log.Printf("Oops... Server is not shutting down! Reason: %v", err)
 		}
@@ -29,8 +29,17 @@ func StartServerWithGracefulShutdown(a *fiber.App) {
 	}()
 
 	// Run server.
-	if err := a.Listen(configs.EnvServerUrl()); err != nil {
-		log.Printf("Oops... Server is not running! Reason: %v", err)
+	if configs.CFG.Server.TlsEnable {
+		// Run server.
+		if err := app.ListenTLS(configs.CFG.Server.Url, configs.CFG.Server.TlsCertificate, configs.CFG.Server.TlsKeyFile); err != nil {
+			log.Fatalf("Oops... Server is not running! Reason: %v", err)
+		}
+
+	} else {
+		// Run server.
+		if err := app.Listen(configs.CFG.Server.Url); err != nil {
+			log.Fatalf("Oops... Server is not running! Reason: %v", err)
+		}
 	}
 
 	<-idleConnsClosed
@@ -38,15 +47,15 @@ func StartServerWithGracefulShutdown(a *fiber.App) {
 
 // StartServer func for starting a simple server.
 func StartServer(app *fiber.App) {
-	if configs.EnvServerTlsEnable() {
+	if configs.CFG.Server.TlsEnable {
 		// Run server.
-		if err := app.ListenTLS(configs.EnvServerUrl(), configs.EnvServerTlsCertificate(), configs.EnvServerTlsKey()); err != nil {
+		if err := app.ListenTLS(configs.CFG.Server.Url, configs.CFG.Server.TlsCertificate, configs.CFG.Server.TlsKeyFile); err != nil {
 			log.Fatalf("Oops... Server is not running! Reason: %v", err)
 		}
 
 	} else {
 		// Run server.
-		if err := app.Listen(configs.EnvServerUrl()); err != nil {
+		if err := app.Listen(configs.CFG.Server.Url); err != nil {
 			log.Fatalf("Oops... Server is not running! Reason: %v", err)
 		}
 	}

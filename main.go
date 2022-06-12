@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/Aviator-Coding/HttpPLC/configs"
 	"github.com/Aviator-Coding/HttpPLC/middleware"
 	"github.com/Aviator-Coding/HttpPLC/routes"
 	"github.com/Aviator-Coding/HttpPLC/utils"
@@ -9,11 +8,8 @@ import (
 )
 
 func main() {
+	// Init Fiber
 	app := fiber.New()
-
-	//run database
-	configs.ConnectDB()
-	utils.CreateIndex()
 
 	// Middleware
 	middleware.FiberMiddleware(app)

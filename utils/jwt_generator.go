@@ -10,13 +10,13 @@ import (
 // GenerateNewAccessToken func for generate a new Access token.
 func GenerateNewAccessToken() (string, error) {
 	// Set secret key from .env file.
-	secret := configs.EnvJwtSecretKey()
+	secret := configs.CFG.JWT.KeySecret
 
 	// Create a new claims.
 	claims := jwt.MapClaims{}
 
 	// Set public claims with expires minutes count for secret key :
-	claims["exp"] = time.Now().Add(time.Minute * time.Duration(configs.EnvJwtSecretKeyExpireMinutesCount())).Unix()
+	claims["exp"] = time.Now().Add(time.Minute * time.Duration(configs.CFG.JWT.KeyExpireMinutes)).Unix()
 
 	// Create a new JWT access token with claims.
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
