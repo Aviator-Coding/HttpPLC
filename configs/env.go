@@ -38,6 +38,7 @@ type JWTToken struct {
 
 var CFG *Config = LoadConfig()
 
+// Load the Current Configuration
 func LoadConfig() *Config {
 	// Load Enviroment Variabels
 	err := godotenv.Load()
