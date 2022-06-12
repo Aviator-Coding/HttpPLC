@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/Aviator-Coding/HttpPLC/configs"
+	"github.com/Aviator-Coding/HttpPLC/middleware"
 	"github.com/Aviator-Coding/HttpPLC/routes"
+	"github.com/Aviator-Coding/HttpPLC/utils"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 func main() {
@@ -13,18 +13,19 @@ func main() {
 
 	//run database
 	configs.ConnectDB()
+	utils.CreateIndex()
 
 	// Middleware
-	app.Use(recover.New())
-	app.Use(cors.New())
+	middleware.FiberMiddleware(app)
 
 	//routes
-	routes.UserPublicRoute(app) //add this
-	routes.SwaggerRoute(app)    //add this
+	routes.UserPublicRoute(app)
+	routes.PlcPublicRoute(app)
+	routes.SwaggerRoute(app)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(&fiber.Map{"data": "Hello from Fiber & mongoDB"})
 	})
 
-	app.Listen(configs.EnvServerUrl())
+	utils.StartServer(app)
 }

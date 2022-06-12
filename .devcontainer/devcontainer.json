@@ -49,6 +49,10 @@
         "27017": {
             "label": "MongoDB",
             "onAutoForward": "notify"
+        },
+        "5432": {
+            "label": "Postgress",
+            "onAutoForward": "notify"
         }
     },
     // Use 'otherPortsAttributes' to configure any ports that aren't configured using 'portsAttributes'.

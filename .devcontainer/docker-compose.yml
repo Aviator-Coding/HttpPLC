@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
       args:
@@ -12,10 +12,10 @@ services:
         # On Linux, you may need to update USER_UID and USER_GID below if not your local UID is not 1000.
         # USER_UID: 1000
         # USER_GID: 1000
-      # command:
-      #   - "--cap-add=SYS_PTRACE"
-      #   - "--security-opt"
-      #   - "seccomp=unconfined"
+        # command:
+        #   - "--cap-add=SYS_PTRACE"
+        #   - "--security-opt"
+        #   - "seccomp=unconfined"
 
     volumes:
       - ..:/workspace:cached
@@ -25,29 +25,38 @@ services:
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     network_mode: service:db
-
     # Uncomment the next line to use a non-root user for all processes.
     # user: node
 
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
-  db:
-    image: mongo:latest
-    restart: unless-stopped
-    container_name:  mongodb-http-plc
-    volumes:
-      -  mongodb-http-plc-data:/data/db
+  # db:
+  #   image: mongo:latest
+  #   restart: unless-stopped
+  #   container_name: mongodb-http-plc
+  #   volumes:
+  #     - mongodb-http-plc-data:/data/db
 
-    # Uncomment to change startup options
-    environment:
-     MONGO_INITDB_ROOT_USERNAME: plcuser
-     MONGO_INITDB_ROOT_PASSWORD: plcpassword
-     MONGO_INITDB_DATABASE: plc
-
+  #   # Uncomment to change startup options
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: plcuser
+  #     MONGO_INITDB_ROOT_PASSWORD: plcpassword
+  #     MONGO_INITDB_DATABASE: plc
     # Add "forwardPorts": ["27017"] to **devcontainer.json** to forward MongoDB locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
-  
+
+  db:
+    image: postgres:14.3-bullseye
+    restart: unless-stopped
+    container_name: postgres-http-plc
+    environment:
+      - POSTGRES_USER=plcuser
+      - POSTGRES_PASSWORD=plcpassword
+      - POSTGRES_DB=plc
+    volumes:
+      - postgres-http-plc-data:/var/lib/postgresql/data
 
 volumes:
-  mongodb-http-plc-data:
+  # mongodb-http-plc-data:
+  postgres-http-plc-data:
