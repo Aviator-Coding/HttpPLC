@@ -1,9 +1,19 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"github.com/jackc/pgtype"
+	"gorm.io/gorm"
+)
+
+type Line struct {
+	gorm.Model
+	Name     string
+	Machines []Machine
+}
 
 type Machine struct {
 	gorm.Model
+	LineID   uint
 	Name     string
 	Stations []Station
 	PLCs     []PLC
@@ -13,17 +23,35 @@ type Machine struct {
 
 type Station struct {
 	gorm.Model
-	Name     string
-	IsActive bool
+	MachineID   uint
+	Name        string
+	ShortName   string
+	Description string
+	IsActive    bool
 }
 
 type PLC struct {
 	gorm.Model
-	Name string
+	MachineID uint
+	Name      string
+	IP        pgtype.Inet `gorm:"type:inet"`
+	Port      int
+	MAC       pgtype.Macaddr `gorm:"type:macaddr"`
 }
 
 type HMI struct {
 	gorm.Model
-	Name  string
-	Users []User
+	MachineID uint
+	Name      string
+	IP        pgtype.Inet `gorm:"type:inet"`
+	Port      int
+	MAC       pgtype.Macaddr `gorm:"type:macaddr"`
+	HMIUsers  []HMIUser
+}
+
+type HMIUser struct {
+	gorm.Model
+	HMIID           uint
+	EmployeID       uint
+	PermissionLevel int
 }
