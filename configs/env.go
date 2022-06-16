@@ -36,14 +36,25 @@ type JWTToken struct {
 	KeyExpireMinutes int
 }
 
-var CFG *Config = LoadConfig()
+var CFG *Config
 
 // Load the Current Configuration
-func LoadConfig() *Config {
-	// Load Enviroment Variabels
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("[ENV]Error loading .env file")
+func LoadConfig() {
+
+	_, ok := os.LookupEnv("ENVIRONMENT")
+
+	if ok {
+		// Load Enviroment Variabels for Testing
+		err := godotenv.Load("../.env")
+		if err != nil {
+			log.Fatal("[ENV]Error Testing Loading .env file")
+		}
+	} else {
+		// Load Enviroment Variabels
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("[ENV]Error Production loading .env file")
+		}
 	}
 
 	cfg := &Config{
@@ -67,7 +78,7 @@ func LoadConfig() *Config {
 			KeyExpireMinutes: getIntEnv(os.Getenv("JWT_SECRET_KEY_EXPIRE_MINUTES_COUNT")),
 		},
 	}
-	return cfg
+	CFG = cfg
 }
 
 // Get the Enviroment Variable `Key` as a String

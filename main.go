@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/Aviator-Coding/HttpPLC/configs"
+	"github.com/Aviator-Coding/HttpPLC/database"
 	"github.com/Aviator-Coding/HttpPLC/middleware"
 	"github.com/Aviator-Coding/HttpPLC/routes"
 	"github.com/Aviator-Coding/HttpPLC/utils"
@@ -11,17 +13,26 @@ func main() {
 	// Init Fiber
 	app := fiber.New()
 
+	//Load Env Files
+	configs.LoadConfig()
+
+	// Connect to DB
+	database.ConnectDB()
+
 	// Middleware
 	middleware.FiberMiddleware(app)
 
-	//routes
+	//Unrestricted Routes
 	routes.UserPublicRoute(app)
 	routes.PlcPublicRoute(app)
 	routes.SwaggerRoute(app)
+
+	routes.UserPrivatRoute(app)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(&fiber.Map{"data": "Hello from Fiber & mongoDB"})
 	})
 
+	routes.NotFoundRoute(app)
 	utils.StartServer(app)
 }

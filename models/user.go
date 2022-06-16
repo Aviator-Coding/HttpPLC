@@ -1,27 +1,25 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
 
-// Employe Database
-type Employe struct {
-	gorm.Model
-	FirstName    string
-	LastName     string
-	Description  string
-	BatchID      uint
-	DepartmentID uint
-	Violations   []Violation
-	IsActive     bool
+	"golang.org/x/crypto/bcrypt"
+)
+
+type User struct {
+	ID        uint      `json:"id" gorm:"primarykey"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Name      string    `json:"name" gorm:"unique" validate:"required,min=3,max=20"`
+	Email     string    `json:"email" gorm:"unique" validate:"required,email"`
+	Password  []byte    `json:"password" validate:"required"`
+	IsAdmin   bool      `json:"is_admin"`
 }
 
-// Department Database
-type Department struct {
-	gorm.Model
-	Name string
+func Hash(password string) ([]byte, error) {
+	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
 
-// Violations
-type Violation struct {
-	gorm.Model
-	Text string
+func VerifyPassword(hashedPassword, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
