@@ -1,11 +1,15 @@
 package routes
 
 import (
-	"io"
+	"fmt"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/Aviator-Coding/HttpPLC/configs"
+	"github.com/Aviator-Coding/HttpPLC/database"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,54 +23,69 @@ type HttpTest struct {
 	expectedCode  int
 }
 
-func TestCreateUserRoute(t *testing.T) {
+func TestPrivateRoutess(t *testing.T) {
+
+	fmt.Println(encryptcookie.GenerateKey())
 	// Define a structure for specifying input and output data of a single test case.
 	tests := []HttpTest{
-		{
-			description:   "Add User without Name",
-			route:         "/user",
-			method:        "POST",
-			tokenString:   "",
-			body:          `{"password":"lol","email": "info@aviator-coding.de"}`,
-			expectedError: false,
-			expectedCode:  403,
-		},
-		{
-			description:   "Add User without Password",
-			route:         "/user",
-			method:        "POST",
-			tokenString:   "",
-			body:          `{"name": "Aviator","email": "info@aviator-coding.de"}`,
-			expectedError: false,
-			expectedCode:  403,
-		},
+		// {
+		// 	description:   "Add User without Name",
+		// 	route:         "/user",
+		// 	method:        "POST",
+		// 	tokenString:   "",
+		// 	body:          `{"password":"lol","email": "info@aviator-coding.de"}`,
+		// 	expectedError: false,
+		// 	expectedCode:  403,
+		// },
+		// {
+		// 	description:   "Add User without Password",
+		// 	route:         "/user",
+		// 	method:        "POST",
+		// 	tokenString:   "",
+		// 	body:          `{"name": "Aviator","email": "info@aviator-coding.de"}`,
+		// 	expectedError: false,
+		// 	expectedCode:  403,
+		// },
+		// {
+		// 	description:   "Add User without Email",
+		// 	route:         "/user",
+		// 	method:        "POST",
+		// 	tokenString:   "",
+		// 	body:          `{"name": "Aviator","password":"lol"}`,
+		// 	expectedError: true,
+		// 	expectedCode:  403,
+		// },
 		{
 			description:   "Add User without Email",
 			route:         "/user",
 			method:        "POST",
 			tokenString:   "",
-			body:          `{"name": "Aviator","password":"lol"}`,
+			body:          `{"name": "Aviatorrr","password":"1234","email": "info@aviator-cddofsdfoding.deee"}`,
 			expectedError: false,
-			expectedCode:  403,
+			expectedCode:  201,
 		},
 	}
 
-	// handler := func(w http.ResponseWriter, r *http.Request) {
-	// 	//io.WriteString(w)
-	// }
+	//Load Env Files
+	configs.LoadConfig()
+	// Connect to DB
+	database.ConnectDB()
+
+	// Define a new Fiber app.
+	app := fiber.New()
+
+	// Define routes.
+	UserPublicRoute(app)
 
 	// Iterate through test single test cases
 	for _, test := range tests {
-
 		// Create a new http request with the route from the test case.
 		req := httptest.NewRequest(test.method, test.route, strings.NewReader(test.body))
+		// req.Header.Set("Authorization", test.tokenString)
 		req.Header.Set("Content-Type", "application/json")
 
 		// Perform the request plain with the app.
-		w := httptest.NewRecorder()
-		//handler(w, req)
-		resp := w.Result()
-		_, err := io.ReadAll(resp.Body)
+		resp, err := app.Test(req, -1) // the -1 disables request latency
 
 		// Verify, that no error occurred, that is not expected
 		assert.Equalf(t, test.expectedError, err != nil, test.description)

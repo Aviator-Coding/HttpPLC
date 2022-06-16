@@ -24,11 +24,12 @@ type DBConfig struct {
 }
 
 type ConfigServer struct {
-	Url            string
-	ReadTimeout    int
-	TlsEnable      bool
-	TlsCertificate string
-	TlsKeyFile     string
+	Url             string
+	ReadTimeout     int
+	TlsEnable       bool
+	TlsCertificate  string
+	TlsKeyFile      string
+	CookieSecretKey string
 }
 
 type JWTToken struct {
@@ -67,11 +68,12 @@ func LoadConfig() {
 			DBName:   getStrEnv(os.Getenv("DB_NAME")),
 		},
 		Server: ConfigServer{
-			Url:            getStrEnv(os.Getenv("SERVER_URL")),
-			ReadTimeout:    getIntEnv(os.Getenv("SERVER_READ_TIMEOUT")),
-			TlsEnable:      getBoolEnv(os.Getenv("SERVER_TLS_ENABLE")),
-			TlsCertificate: getStrEnv(os.Getenv("SERVER_TLS_CERTIFICATE")),
-			TlsKeyFile:     getStrEnv(os.Getenv("SERVER_TLS_KEY")),
+			Url:             getStrEnv(os.Getenv("SERVER_URL")),
+			ReadTimeout:     getIntEnv(os.Getenv("SERVER_READ_TIMEOUT")),
+			TlsEnable:       getBoolEnv(os.Getenv("SERVER_TLS_ENABLE")),
+			TlsCertificate:  getStrEnv(os.Getenv("SERVER_TLS_CERTIFICATE")),
+			TlsKeyFile:      getStrEnv(os.Getenv("SERVER_TLS_KEY")),
+			CookieSecretKey: getStrEnv(os.Getenv("SERVER_COOKIE_KEY")),
 		},
 		JWT: JWTToken{
 			KeySecret:        getStrEnv(os.Getenv("JWT_SECRET_KEY")),

@@ -1,8 +1,10 @@
 package middleware
 
 import (
+	"github.com/Aviator-Coding/HttpPLC/configs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/encryptcookie"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
@@ -16,5 +18,8 @@ func FiberMiddleware(a *fiber.App) {
 		}),
 		// Add simple logger.
 		logger.New(),
+		encryptcookie.New(encryptcookie.Config{
+			Key: configs.CFG.Server.CookieSecretKey,
+		}),
 	)
 }
