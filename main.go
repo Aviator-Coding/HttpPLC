@@ -24,10 +24,16 @@ func main() {
 
 	//Unrestricted Routes
 	routes.UserPublicRoute(app)
+	routes.EmployePublicRoute(app)
+	routes.ViolationPublicRoute(app)
 	routes.PlcPublicRoute(app)
 	routes.SwaggerRoute(app)
 
+	routes.Configure(app)
+
+	// JWT Restricted Routes
 	routes.UserPrivatRoute(app)
+	routes.ViolationPrivatRoute(app)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(&fiber.Map{"data": "Hello from Fiber & mongoDB"})
